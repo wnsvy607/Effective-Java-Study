@@ -21,11 +21,10 @@
 <br>
 <h3>문제점</h3><ol>
 <li>테스트하기 어려운 구조</li>
-</ol><br>
+<br>
 <p>싱글톤 클래스를 사용하는 클라이언트 코드의 테스트가 어려워진다. 인터페이스라면 Mock 객체를 만들 수 있지만, 인터페이스 기반이 아니라면 Mocking이 어렵기 때문이다.</p><br>
-<ol>
 <li>리플렉션을 통해서 private 생성자를 호출할 수 있다. 즉, 리플렉션으로 새로운 인스턴스가 생성되어 싱글톤이 훼손(공격)될 수 있다.</li>
-</ol><br>
+<br>
 <p>&rarr; 생성자에 인스턴스 생성후에 생성자가 호출되면 예외를 던지는 코드를 추가할 수 있다.</p><pre><code>public static final Elvis INSTANCE = new Elvis();
 private static boolean created;
 
@@ -37,7 +36,6 @@ private Elvis() {
     created = true;
 }
 </code></pre><p>(하지만 간결함이라는 장점을 잃는다.)</p><br>
-<ol>
 <li>역직렬화 시 새로운 인스턴스가 생성된다. (의도와 다르게 동작한다)</li>
 </ol><br>
 <blockquote>
@@ -59,7 +57,7 @@ public static Elvis getInstance() { return INSTANCE; }
 <h3>장점</h3><ol>
 <li>정적 메서드를 통해 인스턴스를 접근하게 하면, 싱글톤을 사용할지 매번 다른 인스턴스를 생성할 지 클라이언트 코드의 변경없이 변경할 수 있다.<br></li>
 <li>원한다면 제네릭 싱글톤 팩터리를 사용할 수 있다.</li>
-</ol><br>
+<br>
 <pre><code>public class MetaElvis&lt;T&gt; {
 
     private static final MetaElvis&lt;Object&gt; INSTANCE = new MetaElvis&lt;&gt;();
@@ -94,7 +92,6 @@ hello
 100
 </code></pre><br>
 <br>
-<ol>
 <li>정적 팩터리의 메서드 참조를 공급자(Supplier)로 사용할 수 있다.</li>
 </ol><br>
 <p><code>Elvis::getInstance</code></p>
