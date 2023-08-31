@@ -1,35 +1,37 @@
-<h1>5. 자원을 직접 명시하지 말고 의존 객체 주입을 사용하라.</h1>
-<h2>의존 객체 주입(DI)</h2><p><b>사용하는 자원에 따라 동작이 달라지는 클래스</b>에 사용하기 적합하다.</p><br>
-<br>
-<h3>문제 상황</h3><ol>
-<li>자원을 직접 명시하게 되면 Mocking을 할 수가 없게된다. (엄밀히 말하면 가능은 하지만 번거롭고 바람직하지 않다.)</li>
-</ol><br>
-<pre><code>@Test
-void isValid() {
-	assertTrue(SpellChecker.isValid("test"));
-}
-
-//SpellChecker.class
-
-// 자원을 직접 명시하는 코드
-private static final Dictionary dictionary = new DefaultDictionary();
-</code></pre><p>이미 자원이 클래스가 로드되는 시점에서 무조건 생성되며 변경할 수도 없다.</p><br>
-<ol>
-<li>유연성과 재사용성이 떨어진다.</li>
-</ol><br>
-<p>예제에 나온 <code>SpellChecker</code>가 <code>DefaultDictionary</code>가 아닌 <code>KoreanDictionary</code>나 <code>EnglishDictionary</code>를 사용하고 싶다면 어떻게 해야 할까? 기존처럼 리소스를 고정해놓는 방식을 고수한다면 <code>KoreanSpellChecker</code>, <code>EnglishSpellChecker</code> 처럼 코드가 중복된 클래스를 별도로 만들어야 한다. 게다가, 런타임 도중에 <code>Dictionary</code>를 바꾸기도 어려울 것이다.</p><br>
-<br>
-<h3>DI</h3><p>자원을 <b>인터페이스로 갖고 있으며 객체를 외부에서 주입하는 경우</b> 코드가 유연하고 재사용성이 높아지게 된다. 게다가 Mocking이 가능하여 테스트도 용이해진다.</p><br>
-<h3>변형</h3><p>책에서 생성자에 <code>자원 팩터리</code>를 넘겨 주는 것이 의존 객체 주입의 쓸만한 변형이라고 한다.</p><br>
-<pre><code>public SpellChecker(Supplier&lt;Dictionary&gt; dictionarySupplier) {
-    this.dictionary = dictionarySupplier.get();
-}
-</code></pre><p>그리고 위와 같이 Supplier<T> 인터페이스를 활용하는 것이 완벽한 예라고 한다. (하지만, 자원팩토리 인터페스를 직접 구현해서 넣는 것도 가능하다.)</p><br>
-<br>
-<h3>유의할 점</h3><p>의존 객체 주입은 직접 구현하면 코드를 어지럽게 만들 수 있으므로, 프레임워크를 활용하여 코드를 간결하게 유지하자.</p><br>
-<br>
-<p>결국 DI는 유연함, 재사용성, 테스트 용이성 에서 강점을 얻는다.<br>
-+) 유연함이란?</p><br>
-<p>개인적인 정의: 여러가지 상황과 변화에 대처할 수 있는 능력을 의미한다.<br>
-예: SpellChecker 에서 사용되는 Dictonary 의 기능을 바꾸고 싶다면? SpellChecker와 동일한 클래스를 만들 것이 아니라 SpellChecker에 다른 Dictionary 를 만들어서 주입함으로써 변화에 쉽게 대응할 수 있다.<br>
-즉 OPC(수정에는 닫혀 있고 확장에는 열려있다.)</p><br>
+<h1>4. 인스턴스화를 막으려거든 private 생성자를 사용하라</h1><br>
+<ul>
+<li>간혹 인스턴스화를 막는 것이 바람직한 유틸리티성 클래스들이 있다.
+<ul>
+<li><code>public static</code> 메서드를 가진 클래스들</li>
+<li>로직을 도와주는 성격의 클래스</li>
+<li>ex) <code>org.springframework.util.StringUtils</code>, <code>java.lang.Math</code>, <code>java.util.Arrays</code>, <code>java.util.Collections</code>와 같은 유틸리티 클래스가 있다.</li>
+</ul>
+</li>
+<li>유틸리티 클래스는 <code>public static</code> 메서드만 제공하기 때문에 인스턴스화가 필요하지 않으며, 인스턴스를 통한 메서드 호출은 오히려 인스턴스 메서드와 정적 메서드간의 혼동을 불러 일으킨다. 따라서, 인스턴스화를 방지하는 것이 바람직하다.<br><br></li>
+<li>인스턴스화를 방지하기 위해서 <code>abstract</code>로 클래스를 만들 수 있다.</li>
+<li>하지만 이 방법은 인스턴스화를 방지할 수 없다.
+<ul>
+<li>자바 컴파일러는 생성자를 명시하지 않으면 기본 <code>public</code> 생성자를 만든다.</li>
+<li>만약, 하위클래스를 만들어 상속하게 되면 해당 클래스의 인스턴스를 만들 수 있게된다.</li>
+</ul>
+<br><br></li>
+<li>그래서  대안은 private 생성자를 명시적으로 선언하는 것이다.</li>
+</ul><br>
+<pre><code>	private UtilityClass() {}
+</code></pre><br>
+<ul>
+<li>하지만, 내부에서 private 생성자를 호출할 수도 있기 때문에 내부에서의 인스턴스 생성까지 막기 위해서는 기본 생성자에서 에러(<code>AssertionError</code>)  <code>throw</code>하도록 하면된다.</li>
+</ul><br>
+<pre><code>    private UtilityClass() {
+        throw new AssertionError();
+    }
+</code></pre><ul>
+<li>하지만, 생성자가 분명 존재하는데 호출을 막는 코드는 직관적이지 않다. 따라서, 문서화를 해서 왜 private 생성자를 만들었는지 명시하는 것이 바람직하다.</li>
+<li>게다가 이 방식은 <b>상속을 불가능</b>하게 하는 효과도 있다. (자식 클래스에서 부모 클래스의 생성자를 호출할 수 없기 때문에)</li>
+<li>사실, Spring 의 많은 유틸리티 클래스들은 이 방법을 쓰지 않고 있다.</li>
+</ul><br>
+<h2>결론</h2><ul>
+<li>유틸리티 클래스는 private 생성자를 명시함으로써 인스턴스화를 방지할 수 있다.</li>
+<li>인스턴스화를 완전히 차단하기 위해서 <code>Error</code>를 <code>throw</code>하도록 할 수 있다.</li>
+<li>private 생성자를 사용한다면 문서화를 통해 목적을 명시하자.</li>
+</ul>
