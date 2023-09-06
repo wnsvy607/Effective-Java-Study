@@ -99,8 +99,7 @@ static String firstLineOfFile(String path) throws IOException {
 }
 </code></pre><p>앞서 말했듯 간결함이라는 장점과 더불어, <b>후속 예외까지 전부 보이게 된다</b>.</p>
 <p>결과
-<img src='image.png'></p>
-
+<img src='https://github.com/wnsvy607/Effective-Java-Study/assets/85255237/3b8c2e17-8fa9-4aad-b537-ecab87849147'></p>
 
 <br><br>
 <h2>결론</h2><ul>
