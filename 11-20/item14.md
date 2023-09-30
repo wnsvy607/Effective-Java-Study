@@ -73,7 +73,7 @@ private static final Comparator&lt;PhoneNumber&gt; COMPARATOR =
         comparingInt((PhoneNumber pn) -&gt; pn.areaCode)
                 .thenComparingInt(pn -&gt; pn.prefix)
                 .thenComparingInt(pn -&gt; pn.lineNum);
-</code></pre><p>위 코드에서 함께 언급된 내용으로 <code>comparingInt</code>에서는 타입을 명시적으로 선언해야 했지만, 그 다음부터인<code>thenComparingInt</code>에서는 타입추론이 잘 작동한다.</p><ul>
+</code></pre><p>위 코드에서 함께 언급된 내용으로 <code>comparingInt</code>에서는 타입을 명시적으로 선언해야 했지만, 그 다음부터인<code>thenComparingInt</code>에서는 타입추론이 잘 작동한다.</p><ul>
 <li>타입 추론은 <code>var</code>로 변수선언을 할 때도 쓰인다.</li>
 <li><code>compareTo</code>에서 수를 비교할 경우 단순히 두 수를 더하거나 뺀 값으로 반환한다면 정수 오버플로(또는 언더플로)를 일으키거나 부동소수점 계산 방식에 따른 오류를 낼 수 있다. 따라서, 각 기본타입의 래퍼 클래스 (이를테면 Integer, String 등)가 제공하는 정적 메서드 <code>compare</code>를 이용하거나 비교자 생성 메서드를 사용하자.</li>
 <li>부동소수점 계산의 경우 부동소수점 타입(float, double)의 실제 표현이 지수부와 가수부로 나뉘는데, 가수부가 2진수로 표현되므로 정확한 표현이 어렵다. 특히, 계산을 하게되면 정보의 손실이 발생하기 때문에 정확한 계산이 안될 수 있다.</li>
@@ -87,5 +87,4 @@ public int compareTo(RestaurantService restaurantService) {
 		return 1;
 	return -1;
 }
-
 </code></pre>
